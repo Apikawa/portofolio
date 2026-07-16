@@ -593,7 +593,15 @@
   .skills-layout { grid-template-columns: 1fr; gap: 40px; }
   .exp-grid { grid-template-columns: 1fr; }
   .hero-grid { display: none; }
-  .hero-photo { display: none; }
+    .hero-photo {
+    position: relative;
+    top: unset; right: unset;
+    transform: none;
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+  }
+  .hero-photo-wrap { width: 200px; height: 240px; }
   .slide-item { grid-template-columns: 1fr; }
   .tkj-block-header { flex-wrap: wrap; gap: 12px; }
   .slider-nav { margin-left: 0; width: 100%; justify-content: flex-end; }
