@@ -158,8 +158,8 @@ typeLoop();
   document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
 
   // ── SLIDER ──
-  const sliderState = { mikrotik: 0, fiber: 0 };
-  const sliderMax   = { mikrotik: 5, fiber: 1 };
+  const sliderState = { mikrotik: 0, fiber: 0, server: 0 };
+  const sliderMax   = { mikrotik: 5, fiber: 1, server: 2 };
 
   function updateSlider(id) {
     const track   = document.getElementById(id + '-track');
@@ -184,7 +184,7 @@ typeLoop();
 
   // Init
   updateSlider('mikrotik');
-
+  updateSlider('server');
 
   const sections = document.querySelectorAll('section[id]');
   const navLinks = document.querySelectorAll('.nav-links a');
