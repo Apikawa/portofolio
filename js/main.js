@@ -186,6 +186,86 @@ typeLoop();
   updateSlider('mikrotik');
   updateSlider('server');
 
+// ── SLIDER GESTURE & SCROLL ──
+  const sliderIds = ['mikrotik', 'fiber', 'server'];
+
+  sliderIds.forEach(id => {
+    const viewport = document.querySelector(`#${id}-track`)?.parentElement;
+    const track    = document.getElementById(id + '-track');
+    if (!viewport || !track) return;
+
+    // ── 1. TOUCH SWIPE (HP) ──
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchLocked = null; // 'horizontal' | 'vertical' | null
+
+    viewport.addEventListener('touchstart', e => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchLocked = null;
+    }, { passive: true });
+
+    viewport.addEventListener('touchmove', e => {
+      const diffX = Math.abs(e.touches[0].clientX - touchStartX);
+      const diffY = Math.abs(e.touches[0].clientY - touchStartY);
+
+      // Tentukan arah saat belum terkunci
+      if (!touchLocked) {
+        if (diffX > 8 || diffY > 8) {
+          touchLocked = diffX > diffY ? 'horizontal' : 'vertical';
+        }
+      }
+      // Kalau sudah terkunci horizontal, cegah scroll halaman
+      if (touchLocked === 'horizontal') e.preventDefault();
+    }, { passive: false });
+
+    viewport.addEventListener('touchend', e => {
+      if (touchLocked !== 'horizontal') return;
+      const diffX = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diffX) > 50) {
+        slide(id, diffX > 0 ? 1 : -1);
+      }
+      touchLocked = null;
+    }, { passive: true });
+
+// ── 2. TOUCHPAD 2 JARI HORIZONTAL & SCROLL MOUSE VERTIKAL ──
+    let canSlide = true;
+
+    viewport.addEventListener('wheel', e => {
+      const absX       = Math.abs(e.deltaX);
+      const absY       = Math.abs(e.deltaY);
+      const isTouchpad = absX > 0 || (e.deltaMode === 0 && absY < 50);
+
+      if (isTouchpad && absX > absY) {
+        // ── Touchpad horizontal ──
+        e.preventDefault();
+
+        if (!canSlide) return;
+        if (absX >= 15) {
+          canSlide = false;
+          slide(id, e.deltaX > 0 ? 1 : -1);
+          // Cooldown tetap 600ms, TIDAK direset oleh event susulan (momentum)
+          setTimeout(() => { canSlide = true; }, 600);
+        }
+      } else if (absY >= 100 && absX < 10) {
+        // ── Mouse wheel vertikal murni: biarkan halaman scroll ──
+        return;
+      }
+    }, { passive: false });
+
+    // ── 3. KLIK KIRI/KANAN AREA FOTO ──
+    track.addEventListener('click', e => {
+      // Pastikan klik bukan dari tombol panah atau dot
+      if (e.target.closest('.slider-btn') || e.target.closest('.dot-ind')) return;
+
+      const rect     = viewport.getBoundingClientRect();
+      const clickX   = e.clientX - rect.left;
+      const midPoint = rect.width / 2;
+
+      slide(id, clickX > midPoint ? 1 : -1);
+    });
+  });
+
   const sections = document.querySelectorAll('section[id]');
   const navLinks = document.querySelectorAll('.nav-links a');
   window.addEventListener('scroll', () => {
