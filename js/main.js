@@ -159,7 +159,7 @@ typeLoop();
 
   // ── SLIDER ──
   const sliderState = { mikrotik: 0, fiber: 0, server: 0 };
-  const sliderMax   = { mikrotik: 5, fiber: 1, server: 2 };
+  const sliderMax   = { mikrotik: 5, fiber: 1, server: 3 };
 
   function updateSlider(id) {
     const track   = document.getElementById(id + '-track');
